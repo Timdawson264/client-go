@@ -214,6 +214,12 @@ func (s *fileStore) Update(certData, keyData []byte) (*tls.Certificate, error) {
 	}
 	pem.Encode(f, keyBlock)
 
+	//Ensure the disk is flushed from memory, before any checks/symlink updates.
+	err = f.Sync()
+	if err != nil {
+		return nil, err
+	}
+
 	cert, err := loadFile(certPath)
 	if err != nil {
 		return nil, err
